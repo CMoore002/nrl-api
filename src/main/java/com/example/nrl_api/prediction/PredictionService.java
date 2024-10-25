@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,8 +14,32 @@ public class PredictionService {
     private final PredictionRepository predictionRepository;
 
     @Autowired
-    public PredictionService(PredictionRepository predictionRepository) {
+    public PredictionService(PredictionRepository predictionRepository){
         this.predictionRepository = predictionRepository;
+    }
+
+    public List<Prediction> getPredictionsByVenue(String venue){
+        return predictionRepository.findByVenue(venue);
+    }
+
+    public List<Prediction> getPredictionsByDate(Date date){
+        return predictionRepository.findByDate(date);
+    }
+
+    public List<Prediction> getPredictionsByHomeTeam(String homeTeam){
+        return predictionRepository.findByIdHomeTeam(homeTeam);
+    }
+
+    public List<Prediction> getPredictionsByAwayTeam(String awayTeam){
+        return predictionRepository.findByAwayTeam(awayTeam);
+    }
+
+    public List<Prediction> getPredictionsBySeason(Integer season){
+        return predictionRepository.findByIdSeason(season);
+    }
+
+    public List<Prediction> getPredictionsByRound(String round){
+        return predictionRepository.findByIdRound(round);
     }
 
     public ResponseEntity<Object> newPrediction(Prediction prediction){
@@ -38,7 +63,8 @@ public class PredictionService {
         existingPrediction.setId(id);
         existingPrediction.setDate(prediction.getDate());
         existingPrediction.setPrediction(prediction.getPrediction());
-        existingPrediction.setAwayScore(prediction.getawayScore());
+        existingPrediction.setAwayScore(prediction.getAwayScore());
+        existingPrediction.setAwayTeam(prediction.getAwayTeam());
         existingPrediction.setHomeScore(prediction.getHomeScore());
         existingPrediction.setMargin(prediction.getMargin());
         existingPrediction.setVenue(prediction.getVenue());
