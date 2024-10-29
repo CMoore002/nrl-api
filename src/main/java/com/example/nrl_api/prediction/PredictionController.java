@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -26,34 +25,29 @@ public class PredictionController {
         return this.predictionService.getPredictions();
     }
 
-    @GetMapping("/venue")
-    public List<Prediction> getPredictionsByVenue(@RequestParam String venue){
-        return this.predictionService.getPredictionsByVenue(venue);
+    @GetMapping("/latest")
+    public List<Prediction> getLatestPredictions() {
+        return predictionService.getLatestPredictions();
     }
 
-    @GetMapping("/date")
-    public List<Prediction> getPredictionsByDate(@RequestParam Date date){
-        return this.predictionService.getPredictionsByDate(date);
+    @GetMapping("/season/{season}/round/{round}")
+    public List<Prediction> getPredictionsByIdSeasonAndIdRound(@PathVariable Integer season, @PathVariable String round){
+        return this.predictionService.getPredictionsByIdSeasonAndIdRound(season, round);
     }
 
-    @GetMapping("/homeTeam")
-    public List<Prediction> getPredictionsByHomeTeam(@RequestParam String homeTeam){
+    @GetMapping("/homeTeam/{homeTeam}")
+    public List<Prediction> getPredictionsByHomeTeam(@PathVariable String homeTeam){
         return this.predictionService.getPredictionsByHomeTeam(homeTeam);
     }
 
-    @GetMapping("/awayTeam")
-    public List<Prediction> getPredictionsByAwayTeam(@RequestParam String awayTeam){
+    @GetMapping("/awayTeam/{awayTeam}")
+    public List<Prediction> getPredictionsByAwayTeam(@PathVariable String awayTeam){
         return this.predictionService.getPredictionsByAwayTeam(awayTeam);
     }
 
-    @GetMapping("/season")
-    public List<Prediction> getPredictionsBySeason(@RequestParam Integer season){
+    @GetMapping("/season/{season}")
+    public List<Prediction> getPredictionsBySeason(@PathVariable Integer season){
         return this.predictionService.getPredictionsBySeason(season);
-    }
-
-    @GetMapping("/round")
-    public List<Prediction> getPredictionsByRound(@RequestParam String round){
-        return this.predictionService.getPredictionsByRound(round);
     }
 
     /*

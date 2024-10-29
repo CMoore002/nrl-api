@@ -5,8 +5,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
 import java.util.List;
+import java.util.Comparator;
 import java.util.Optional;
 
 @Service
@@ -18,12 +18,20 @@ public class PredictionService {
         this.predictionRepository = predictionRepository;
     }
 
-    public List<Prediction> getPredictionsByVenue(String venue){
-        return predictionRepository.findByVenue(venue);
-    }
 
-    public List<Prediction> getPredictionsByDate(Date date){
-        return predictionRepository.findByDate(date);
+    public List<Prediction> getLatestPredictions() {
+        List<Prediction> latestSeasonPredictions = predictionRepository.findTopByOrderBySeasonAndRoundDesc();
+        // Find the latest round based on the custom order
+        Optional<String> latestRound = latestSeasonPredictions.stream()
+                .map(prediction -> prediction.getId().getRound())
+                .max(Comparator.comparingInt(RoundUtils::getRoundOrder));
+
+        if (latestRound.isPresent()) {
+            Integer season = latestSeasonPredictions.getFirst().getId().getSeason(); // Latest season
+            return predictionRepository.findByIdSeasonAndIdRound(season, latestRound.get());
+        }
+
+        return List.of(); // Return an empty list if no predictions found
     }
 
     public List<Prediction> getPredictionsByHomeTeam(String homeTeam){
@@ -38,8 +46,8 @@ public class PredictionService {
         return predictionRepository.findByIdSeason(season);
     }
 
-    public List<Prediction> getPredictionsByRound(String round){
-        return predictionRepository.findByIdRound(round);
+    public List<Prediction> getPredictionsByIdSeasonAndIdRound(Integer season, String round){
+        return predictionRepository.findByIdSeasonAndIdRound(season, round);
     }
 
     public ResponseEntity<Object> newPrediction(Prediction prediction){
