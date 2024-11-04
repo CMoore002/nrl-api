@@ -50,11 +50,8 @@ public class PredictionController {
         return this.predictionService.getPredictionsBySeason(season);
     }
 
-    /*
-    * TODO: potentially update
-    *  */
     @PostMapping("/")
-    public ResponseEntity<Object> createPrediction(@PathVariable Prediction prediction) {
+    public ResponseEntity<Object> createPrediction(@RequestBody Prediction prediction) {
         return predictionService.newPrediction(prediction);
     }
 
