@@ -1,8 +1,13 @@
 version: 0.2
 
 phases:
+  install:
+    runtime-versions:
+      java: corretto21
   pre_build:
     commands:
+      - java -version
+      - mvn -version
       - echo Logging in to Amazon ECR...
       - aws --version
       #- $(aws ecr get-login --region ap-southeast-2 --no-include-email
