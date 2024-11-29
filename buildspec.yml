@@ -15,7 +15,13 @@ phases:
       - REPOSITORY_URI=442426855749.dkr.ecr.ap-southeast-2.amazonaws.com/docker/springboot
       - IMAGE_TAG=build-$(echo $CODEBUILD_BUILD_ID | awk -F":" '{print $2}')
       - docker pull postgres:17
-      - docker run --rm --name postgres_db -p 5432:5432 -e POSTGRES_USER=nrl_user -e POSTGRES_PASSWORD=nrl_password -d postgres:17
+      - docker run --rm --name postgres_db -p 5432:5432 -e POSTGRES_DB=nrl-prediction -e POSTGRES_USER=nrl_user -e POSTGRES_PASSWORD=nrl_password -d postgres:17
+      - docker cp misc/nrl-prediction-dump.sql postgres_db:/nrl-prediction-dump.sql
+      - docker exec -it postgres_db bash
+      - psql -U nrl_user -d nrl-prediction
+      - CREATE ROLE postgres;
+      - \q
+      - pg_restore -U postgres_db -d nrl-prediction /nrl-prediction-dump.sql
   build:
     commands:
       - echo Build started on `date`
@@ -24,6 +30,7 @@ phases:
       - echo Building the Docker image...
       - docker build -t $REPOSITORY_URI:latest .
       - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
+
   post_build:
     commands:
       - echo Build started on `date`
