@@ -14,12 +14,21 @@ phases:
       - aws ecr get-login-password --region ap-southeast-2 | docker login --username AWS --password-stdin 442426855749.dkr.ecr.ap-southeast-2.amazonaws.com
       - REPOSITORY_URI=442426855749.dkr.ecr.ap-southeast-2.amazonaws.com/docker/springboot
       - IMAGE_TAG=build-$(echo $CODEBUILD_BUILD_ID | awk -F":" '{print $2}')
+      - echo Pulling PostgreSQL image...
       - docker pull postgres:17
-      - docker run --rm --name postgres_db -p 5432:5432 -e POSTGRES_DB=nrl-prediction -e POSTGRES_USER=nrl_user -e POSTGRES_PASSWORD=nrl_password -d postgres:17
-      - echo Waiting for PostgreSQL to initialize...
-      - sleep 10
+      - echo Starting PostgreSQL container...
+      - docker run --rm --name postgres_db -p 5432:5432 \
+        -e POSTGRES_DB=nrl-prediction \
+        -e POSTGRES_USER=nrl_user \
+        -e POSTGRES_PASSWORD=nrl_password \
+        -d postgres:17
+      - echo Waiting for PostgreSQL to be ready...
+      - until docker exec postgres_db pg_isready -U nrl_user; do sleep 2; done
+      - echo PostgreSQL is ready!
+      - echo Copying database dump into PostgreSQL container...
       - docker cp misc/nrl-prediction-dump.sql postgres_db:/nrl-prediction-dump.sql
-      - docker exec postgres_db sh -c "psql -U nrl_user -d nrl-prediction -f /nrl-prediction-dump.sql"
+      - echo Restoring database dump using pg_restore...
+      - docker exec postgres_db sh -c "pg_restore -U nrl_user -d nrl-prediction /nrl-prediction-dump.sql"
   build:
     commands:
       - echo Build started on `date`
