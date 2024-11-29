@@ -16,6 +16,8 @@ phases:
       - IMAGE_TAG=build-$(echo $CODEBUILD_BUILD_ID | awk -F":" '{print $2}')
       - docker pull postgres:17
       - docker run --rm --name postgres_db -p 5432:5432 -e POSTGRES_DB=nrl-prediction -e POSTGRES_USER=nrl_user -e POSTGRES_PASSWORD=nrl_password -d postgres:17
+      - echo Waiting for PostgreSQL to initialize...
+      - sleep 10
       - docker cp misc/nrl-prediction-dump.sql postgres_db:/nrl-prediction-dump.sql
       - docker exec postgres_db sh -c "psql -U nrl_user -d nrl-prediction -f /nrl-prediction-dump.sql"
   build:
