@@ -14,6 +14,8 @@ phases:
       - aws ecr get-login-password --region ap-southeast-2 | docker login --username AWS --password-stdin 442426855749.dkr.ecr.ap-southeast-2.amazonaws.com
       - REPOSITORY_URI=442426855749.dkr.ecr.ap-southeast-2.amazonaws.com/docker/springboot
       - IMAGE_TAG=build-$(echo $CODEBUILD_BUILD_ID | awk -F":" '{print $2}')
+      - docker pull postgres:17
+      - docker run --rm --name postgres_db -p 5432:5432 -e POSTGRES_USER=nrl_user -e POSTGRES_PASSWORD=nrl_password -d postgres:17
   build:
     commands:
       - echo Build started on `date`
