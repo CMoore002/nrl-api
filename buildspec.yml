@@ -17,11 +17,7 @@ phases:
       - echo Pulling PostgreSQL image...
       - docker pull postgres:17
       - echo Starting PostgreSQL container...
-      - docker run --rm --name postgres_db -p 5432:5432 \
-        -e POSTGRES_DB=nrl-prediction \
-        -e POSTGRES_USER=nrl_user \
-        -e POSTGRES_PASSWORD=nrl_password \
-        -d postgres:17
+      - docker run --rm --name postgres_db -p 5432:5432 -e POSTGRES_DB=nrl-prediction -e POSTGRES_USER=nrl_user -e POSTGRES_PASSWORD=nrl_password -d postgres:17
       - echo Waiting for PostgreSQL to be ready...
       - until docker exec postgres_db pg_isready -U nrl_user; do sleep 2; done
       - echo PostgreSQL is ready!
