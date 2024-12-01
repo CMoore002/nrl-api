@@ -13,6 +13,7 @@ phases:
       #- $(aws ecr get-login --region ap-southeast-2 --no-include-email
       - aws ecr get-login-password --region ap-southeast-2 | docker login --username AWS --password-stdin 442426855749.dkr.ecr.ap-southeast-2.amazonaws.com
       - REPOSITORY_URI=442426855749.dkr.ecr.ap-southeast-2.amazonaws.com/docker/springboot
+      - POSTGRES_REPOSITORY_URI=442426855749.dkr.ecr.ap-southeast-2.amazonaws.com/docker/postgres
       - IMAGE_TAG=build-$(echo $CODEBUILD_BUILD_ID | awk -F":" '{print $2}')
       - echo Pulling PostgreSQL image...
       - docker pull postgres:17
@@ -35,6 +36,9 @@ phases:
       - echo Building the Docker image...
       - docker build -t $REPOSITORY_URI:latest .
       - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
+      - echo Tagging PostgreSQL container for ECR...
+      - docker commit postgres_db $POSTGRES_REPOSITORY_URI:latest
+      - docker tag $POSTGRES_REPOSITORY_URI:latest $POSTGRES_REPOSITORY_URI:$IMAGE_TAG
 
   post_build:
     commands:
@@ -42,12 +46,16 @@ phases:
       - echo pushing to repo
       - docker push $REPOSITORY_URI:latest
       - docker push $REPOSITORY_URI:$IMAGE_TAG
+      - echo Pushing PostgreSQL image to ECR...
+      - docker push $POSTGRES_REPOSITORY_URI:latest
+      - docker push $POSTGRES_REPOSITORY_URI:$IMAGE_TAG
       - echo Writing image definitions file...
-      #Give container name
       - DOCKER_CONTAINER_NAME=nrl-api
-      - printf '[{"name":"%s","imageUri":"%s"}]' $DOCKER_CONTAINER_NAME $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
-      - echo $DOCKER_CONTAINER_NAME
-      - echo printing imagedefinitions.json
+      - POSTGRES_CONTAINER_NAME=postgres
+      - printf '[{"name":"%s","imageUri":"%s"},{"name":"%s","imageUri":"%s"}]' \
+        $DOCKER_CONTAINER_NAME $SPRINGBOOT_REPOSITORY_URI:$IMAGE_TAG \
+        $POSTGRES_CONTAINER_NAME $POSTGRES_REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
+      - echo Printing imagedefinitions.json...
       - cat imagedefinitions.json
 
 artifacts:
