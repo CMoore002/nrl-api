@@ -1,32 +1,21 @@
-version: '3.8'
-
+version: "3.8"
 services:
   api:
-    image: nrl-api:latest
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: 442426855749.dkr.ecr.ap-southeast-2.amazonaws.com/docker/springboot:latest
     ports:
       - "8080:8080"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/nrl_database
-      SPRING_DATASOURCE_USERNAME: nrl_user
-      SPRING_DATASOURCE_PASSWORD: nrl_password
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://db:5432/nrl_database"
+      SPRING_DATASOURCE_USERNAME: "nrl_user"
+      SPRING_DATASOURCE_PASSWORD: "nrl_password"
+      SPRING_JPA_HIBERNATE_DDL_AUTO: "update"
     depends_on:
       - db
-
   db:
-    image: postgres:17
-    container_name: postgres_db
+    image: 442426855749.dkr.ecr.ap-southeast-2.amazonaws.com/docker/postgres:latest
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_DB: nrl_database
-      POSTGRES_USER: nrl_user
-      POSTGRES_PASSWORD: nrl_password
-    volumes:
-      - postgres_data:/var/lib/postgresql@17/data
-
-volumes:
-  postgres_data:
+      POSTGRES_DB: "nrl_database"
+      POSTGRES_USER: "nrl_user"
+      POSTGRES_PASSWORD: "nrl_password"

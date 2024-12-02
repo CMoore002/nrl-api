@@ -37,8 +37,8 @@ phases:
       - docker build -t $REPOSITORY_URI:latest .
       - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
       - echo Tagging PostgreSQL container for ECR...
-      - docker commit postgres_db $POSTGRES_REPOSITORY_URI:latest
-      - docker tag $POSTGRES_REPOSITORY_URI:latest $POSTGRES_REPOSITORY_URI:$IMAGE_TAG
+#      - docker commit postgres_db $POSTGRES_REPOSITORY_URI:latest
+#      - docker tag $POSTGRES_REPOSITORY_URI:latest $POSTGRES_REPOSITORY_URI:$IMAGE_TAG
 
   post_build:
     commands:
@@ -47,14 +47,22 @@ phases:
       - docker push $REPOSITORY_URI:latest
       - docker push $REPOSITORY_URI:$IMAGE_TAG
       - echo Pushing PostgreSQL image to ECR...
-      - docker push $POSTGRES_REPOSITORY_URI:latest
-      - docker push $POSTGRES_REPOSITORY_URI:$IMAGE_TAG
+#      - docker push $POSTGRES_REPOSITORY_URI:latest
+#      - docker push $POSTGRES_REPOSITORY_URI:$IMAGE_TAG
       - echo Writing image definitions file...
       - DOCKER_CONTAINER_NAME=nrl-api
       - POSTGRES_CONTAINER_NAME=postgres
       - printf '[{"name":"%s","imageUri":"%s"},{"name":"%s","imageUri":"%s"}]' \
         $DOCKER_CONTAINER_NAME $SPRINGBOOT_REPOSITORY_URI:$IMAGE_TAG \
         $POSTGRES_CONTAINER_NAME $POSTGRES_REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
+      - echo Zipping docker-compose.yml...
+      - mkdir -p deploy
+      - cp docker-compose.yml deploy/
+      - cd deploy
+      - zip -r deploy.zip docker-compose.yml
+      - echo Uploading zip file to S3...
+      - aws s3 cp deploy.zip s3://nrl-api-deploy-bucket/deploy.zip
+      - echo Deployment artifact uploaded successfully.
       - echo Printing imagedefinitions.json...
       - cat imagedefinitions.json
 
@@ -62,3 +70,4 @@ artifacts:
   files:
     - imagedefinitions.json
     - target/nrl-api-0.0.1-SNAPSHOT.jar
+    - deploy/deploy.zip
