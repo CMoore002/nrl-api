@@ -19,3 +19,9 @@ services:
       POSTGRES_DB: "nrl_database"
       POSTGRES_USER: "nrl_user"
       POSTGRES_PASSWORD: "nrl_password"
+    volumes:
+      - postgres_data:/var/lib/postgresql@17/data
+
+volumes:
+  postgres_data:
+
