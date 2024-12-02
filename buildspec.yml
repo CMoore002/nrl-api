@@ -64,6 +64,7 @@ phases:
       - aws s3 cp deploy.zip s3://nrl-api-deploy-bucket/deploy.zip
       - echo Deployment artifact uploaded successfully.
       - echo Printing imagedefinitions.json...
+      - cd ..
       - cat imagedefinitions.json
 
 artifacts:
