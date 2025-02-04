@@ -67,9 +67,9 @@ public class PredictionController {
         return this.predictionService.deletePrediction(id);
     }
 
-    @GetMapping("/{season}/{round}/{home_team}")
-    public ResponseEntity<Object> getPredictionById(@PathVariable Integer season, @PathVariable String round, @PathVariable String home_team) {
-        CompositeKey id = new CompositeKey(season, round, home_team);
+    @GetMapping("/{season}/{round}/{homeTeam}")
+    public ResponseEntity<Object> getPredictionById(@PathVariable Integer season, @PathVariable String round, @PathVariable String homeTeam) {
+        CompositeKey id = new CompositeKey(season, round, homeTeam);
 
         return this.predictionService.getPredictionById(id);
     }
