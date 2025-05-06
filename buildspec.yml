@@ -1,0 +1,24 @@
+version: 0.2
+## comment
+phases:
+  install:
+    runtime-versions:
+      java: corretto21
+  pre_build:
+    commands:
+      - echo Pre-build phase - Setting up...
+      - chmod +x mvnw
+  build:
+    commands:
+      - echo Build started on `date`
+      - echo building the Jar file
+      - mvn clean package
+      - echo Build completed successfully
+
+  post_build:
+    commands:
+      - echo Post-build - Preparing artifact...
+
+artifacts:
+  files:
+    - target/nrl-api-0.0.1-SNAPSHOT.jar
